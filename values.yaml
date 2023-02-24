@@ -9,7 +9,7 @@ replicaCount: 1
 appName: "wordpress"
 run: "wordpress"
 
-ssmCsiRole: ""
+ssmCsiRole: "arn:aws:iam::454578700264:role/vr-argo-sm-csi-20230224085404767800000002"
 image:
   repository: wordpress
   tag: 5.8.0-apache
