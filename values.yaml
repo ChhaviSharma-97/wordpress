@@ -1,0 +1,97 @@
+# Default values for wordpress-awsRDS.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# namespace:
+#   name: wordpress
+
+replicaCount: 1
+appName: "wordpress"
+run: "wordpress"
+
+ssmCsiRole: ""
+image:
+  repository: wordpress
+  tag: 5.8.0-apache
+  pullPolicy: IfNotPresent
+  
+
+strategy:
+  type: Recreate
+        
+       
+service:
+  type: ClusterIP
+  containerPort: 80
+
+environments:
+  - name: WORDPRESS_DB_HOST
+    valueFrom:
+      secretKeyRef:
+         name: vr-creds
+         key: DATABASE_HOST_STRING_Secret
+  - name: WORDPRESS_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+         name: vr-creds
+         key: DB_PASSWORD_Secret
+  - name: WORDPRESS_DB_USER
+    valueFrom:
+      secretKeyRef:
+         name: vr-creds
+         key: DB_USER_NAME_Secret
+  - name: DATABASE_NAME
+    valueFrom:
+      secretKeyRef:
+         name: vr-creds
+         key: DATABASE_NAME_Secret
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  ssl_redirect: false
+  paths:
+    - path: /
+      serviceName: svc-gateway-service
+      servicePort: 80
+      
+configmap:
+  data: "version: apache"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1000Mi
+  requests:
+    cpu: 500m
+    memory: 1000Mi
+     
+  # If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+capacity:
+  storage: 4Gi
+hostPath:
+  path: "/mnt/data"
+pv:
+  name: wp-pv-name
+sc:
+  name: manual
+  resources:
+    requests:
+       storage: 2Gi
+
+
+
+
+

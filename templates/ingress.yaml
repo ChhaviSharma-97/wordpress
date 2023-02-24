@@ -1,0 +1,32 @@
+{{- with .Values.ingress }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $.Values.appName }}-ingress
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Values.appName }}-ingress
+  {{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 -}}
+  {{- end }}
+    {{- if .ssl_redirect }}
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    {{- end }}
+spec:
+  rules:
+    {{ if .ssl_redirect }}
+    {{ include "ingress-ssl-redirect-block" . | nindent 4 }}
+    {{ end }}
+    - http:
+        paths:
+        {{- range .paths }}
+          - path: {{ .path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
+        {{- end }}
+    {{- end }}
