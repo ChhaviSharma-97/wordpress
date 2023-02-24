@@ -54,13 +54,6 @@ spec:
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-    {{ if hasKey .Values "tolerations" }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{ toYaml . | nindent 8 }}
-    {{- end }}
-    {{ end }}
-      {{ if hasKey .Values "nodeSelector" }}
       volumes:
       - name: wordpress-persistent-storage
         persistentVolumeClaim:
@@ -71,9 +64,4 @@ spec:
           readOnly: true
           volumeAttributes:
               secretProviderClass: aws-secrets2
-      nodeSelector:
-      {{ with .nodeSelector }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{ end }}
     
