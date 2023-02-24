@@ -40,11 +40,8 @@ environments:
       secretKeyRef:
          name: vr-creds
          key: DB_USER_NAME_Secret
-  - name: DATABASE_NAME
-    valueFrom:
-      secretKeyRef:
-         name: vr-creds
-         key: DATABASE_NAME_Secret
+  - name: WORDPRESS_DB_NAME
+    value: "wordpress"
 
 ingress:
   annotations:
