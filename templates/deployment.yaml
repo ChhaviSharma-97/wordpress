@@ -62,6 +62,9 @@ spec:
     {{ end }}
       {{ if hasKey .Values "nodeSelector" }}
       volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wp-pv-claim
       - name: creds-volume
         csi:
           driver: secrets-store.csi.k8s.io
